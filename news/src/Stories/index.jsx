@@ -2,26 +2,42 @@ import React from "react";
 import axios from "axios";
 import timeago from "epoch-timeago";
 import logo from "../img/y.jpg";
+import { Alert } from "reactstrap";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
 
-type props = {
+type Props = {
   searchTerm: string
 };
 
 type StateProps = {
   topStories: Array<Number>,
-  promises: Array<Object>,
-  searchItem: string,
-  isMounted: boolean,
-  pageCount: number,
-  currentPage: number,
-  todosPerPage: number
+  searchItem?: string,
+  isMounted?: boolean,
+  pageCount?: number,
+  currentPage?: number,
+  todosPerPage: number,
+  promises?: [
+    {
+      deleted?: boolean,
+      type: string,
+      by: string,
+      time: number,
+      text?: string,
+      dead?: boolean,
+      parent?: number,
+      kids: Array<Number>,
+      url: string,
+      score: Number,
+      title: string,
+      descendants: number
+    }
+  ]
 };
 
-class newStories extends React.Component<props, StateProps> {
-  _isMounted = false;
+class NewStories extends React.Component<Props, StateProps> {
+  //isMounted = false;
   constructor() {
     super();
     this.state = {
@@ -36,17 +52,9 @@ class newStories extends React.Component<props, StateProps> {
   }
 
   // Onclick change the data onscreen by setting the state of the search item
-  getStories(searchItem: string) {
-    this.setState({ searchItem: searchItem });
-  }
-
-  handleClick() {
-    this.setState({
-      currentPage: this.state.currentPage + 1
-    });
-  }
-
-  componentDidMount() {
+  getStories(item: string) {
+    console.log(item);
+    this.setState({ searchItem: item });
     const { searchItem } = this.state;
     axios
       .get(
@@ -68,7 +76,22 @@ class newStories extends React.Component<props, StateProps> {
             pageCount: data.length / 10
           });
         });
+      })
+      .catch(error => {
+        return (
+          <Alert color="primary">Your request failed please try again! </Alert>
+        );
       });
+  }
+
+  handleClick() {
+    this.setState({
+      currentPage: this.state.currentPage + 1
+    });
+  }
+
+  componentDidMount() {
+    this.getStories("newStories");
   }
   render() {
     const navStyle = {
@@ -155,66 +178,66 @@ class newStories extends React.Component<props, StateProps> {
             width: "70%"
           }}
         >
-          <ul style={navStyle}>
+          <div style={navStyle}>
             <img
               src={logo}
               alt="logo"
               style={{ border: "solid white 0.2px" }}
             />
-            <li>
+            <div>
               &nbsp;<b>Hacker News</b>&nbsp;&nbsp;
-            </li>
+            </div>
             {
-              <li style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("new")}> new&nbsp;|</a>
-              </li>
+              <div style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("newstories")}> new&nbsp;|</a>
+              </div>
             }
             {
-              <li style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("past")}>
+              <div style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("paststories")}>
                   &nbsp; past &nbsp;|
                 </a>
-              </li>
+              </div>
             }
             {
-              <li style={{ cursor: "pointer" }}>
+              <div style={{ cursor: "pointer" }}>
                 <a onClick={() => this.getStories("comments")}>
                   &nbsp;comments &nbsp;|
                 </a>
-              </li>
+              </div>
             }
             {
-              <li style={{ cursor: "pointer" }}>
+              <div style={{ cursor: "pointer" }}>
                 <div onClick={() => this.getStories("askstories")}>
                   &nbsp;ask &nbsp;|
                 </div>
-              </li>
+              </div>
             }
             {
-              <li style={{ cursor: "pointer" }}>
+              <div style={{ cursor: "pointer" }}>
                 <a onClick={() => this.getStories("showstories")}>
                   &nbsp; show &nbsp;|
                 </a>
-              </li>
+              </div>
             }
             {
-              <li style={{ cursor: "pointer" }}>
+              <div style={{ cursor: "pointer" }}>
                 <a onClick={() => this.getStories("jobstories")}>
                   &nbsp; jobs &nbsp;|
                 </a>
-              </li>
+              </div>
             }
             {
-              <li style={{ cursor: "pointer" }}>
+              <div style={{ cursor: "pointer" }}>
                 <a
                   href="https://www.mcdonalds.com/us/en-us.html"
                   style={{ textDecoration: "none", color: "black" }}
                 >
                   &nbsp;submit
                 </a>
-              </li>
+              </div>
             }
-          </ul>
+          </div>
           <div
             style={{
               display: "flex",
@@ -248,4 +271,4 @@ class newStories extends React.Component<props, StateProps> {
     );
   }
 }
-export default newStories;
+export default NewStories;
