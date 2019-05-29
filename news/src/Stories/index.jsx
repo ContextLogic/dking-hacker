@@ -38,6 +38,58 @@ type StateProps = {
   ]
 };
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Resize = styled.div`
+  width: 80%;
+`;
+
+const Logo = styled.img`
+  border: solid white 0.2px;
+`;
+
+const NavBar = styled.div`
+  display: flex;
+  place-content: center;
+  items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  list-style: none;
+  justify-content: flex-start;
+  place-content: flex-start;
+  width: 100%;
+  height: 25px;
+  background-color: #f4783a;
+`;
+
+const Pointer = styled.div`
+  cursor: pointer;
+`;
+
+const Table = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-direction: column;
+  background: #ffccb3;
+  flex: 1;
+`;
+
+const Anchor = styled.a`
+  text-decoration: none;
+  color: black;
+`;
+
+const Stories = styled.div`
+  font-size: 10px;
+  display: flex;
+  color: grey;
+`;
+
 class NewStories extends React.Component<Props, StateProps> {
   //isMounted = false;
   constructor() {
@@ -55,7 +107,6 @@ class NewStories extends React.Component<Props, StateProps> {
 
   // Onclick change the data onscreen by setting the state of the search item
   getStories(item: string) {
-    console.log(item);
     this.setState({ searchItem: item });
     const { searchItem } = this.state;
     axios
@@ -96,20 +147,6 @@ class NewStories extends React.Component<Props, StateProps> {
     this.getStories("newStories");
   }
   render() {
-    const navStyle = {
-      display: "flex",
-      placeContent: "center",
-      items: "center",
-      flexDirection: "row",
-      flexWrap: "wrap",
-      listStyle: "none",
-      justifyContent: "flex-start",
-      placeContent: "flex-start",
-      width: "100%",
-      height: "25px",
-      backgroundColor: "#f4783a"
-    };
-
     const { currentPage, todosPerPage } = this.state;
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
@@ -137,20 +174,15 @@ class NewStories extends React.Component<Props, StateProps> {
           (stories, index) =>
             stories && (
               <div key={stories.id}>
-                <a
-                  style={{ textDecoration: "none", color: "black" }}
-                  href={stories.url}
-                >
+                <Anchor href={stories.url}>
                   {index + 1}. {stories.title}{" "}
-                </a>
-                <div
-                  style={{ fontSize: "10px", display: "flex", color: "grey" }}
-                >
+                </Anchor>
+                <Stories>
                   &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   {stories.score} points by {stories.by}&nbsp; &nbsp;{" "}
                   {getTime(stories.time)} | hide | {stories.descendants}{" "}
                   comments
-                </div>
+                </Stories>
               </div>
             )
         )
@@ -158,104 +190,55 @@ class NewStories extends React.Component<Props, StateProps> {
         <h3>Loading data</h3>
       );
 
-    const renderPageNumbers = () => (
-      <div
-        style={{ listStyle: "none", color: "black" }}
-        onClick={this.handleClick}
-      >
-        show more
-      </div>
-    );
-
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}
-      >
-        <div
-          style={{
-            width: "70%"
-          }}
-        >
-          <div style={navStyle}>
-            <img
-              src={logo}
-              alt="logo"
-              style={{ border: "solid white 0.2px" }}
-            />
+      <Container>
+        <Resize>
+          <NavBar>
+            <Logo src={logo} alt="logo" />
             <div>
               &nbsp;<b>Hacker News</b>&nbsp;&nbsp;
             </div>
             {
-              <div style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("newstories")}> new&nbsp;|</a>
-              </div>
+              <Pointer onClick={() => this.getStories("newstories")}>
+                new &nbsp;|
+              </Pointer>
             }
             {
-              <div style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("paststories")}>
-                  &nbsp; past &nbsp;|
-                </a>
-              </div>
+              <Pointer onClick={() => this.getStories("paststories")}>
+                &nbsp; past &nbsp;|
+              </Pointer>
             }
             {
-              <div style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("comments")}>
-                  &nbsp;comments &nbsp;|
-                </a>
-              </div>
+              <Pointer onClick={() => this.getStories("comments")}>
+                &nbsp;comments &nbsp;|
+              </Pointer>
             }
             {
-              <div style={{ cursor: "pointer" }}>
-                <div onClick={() => this.getStories("askstories")}>
-                  &nbsp;ask &nbsp;|
-                </div>
-              </div>
+              <Pointer onClick={() => this.getStories("askstories")}>
+                &nbsp;ask &nbsp;|
+              </Pointer>
             }
             {
-              <div style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("showstories")}>
-                  &nbsp; show &nbsp;|
-                </a>
-              </div>
+              <Pointer onClick={() => this.getStories("showstories")}>
+                &nbsp; show &nbsp;|
+              </Pointer>
             }
             {
-              <div style={{ cursor: "pointer" }}>
-                <a onClick={() => this.getStories("jobstories")}>
-                  &nbsp; jobs &nbsp;|
-                </a>
-              </div>
+              <Pointer onClick={() => this.getStories("jobstories")}>
+                &nbsp; jobs &nbsp;|
+              </Pointer>
             }
             {
-              <div style={{ cursor: "pointer" }}>
-                <a
-                  href="https://www.mcdonalds.com/us/en-us.html"
-                  style={{ textDecoration: "none", color: "black" }}
-                >
+              <Pointer>
+                <Anchor href="https://www.mcdonalds.com/us/en-us.html">
                   &nbsp;submit
-                </a>
-              </div>
+                </Anchor>
+              </Pointer>
             }
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              flexDirection: "column",
-              background: "#ffccb3",
-              flex: 1
-            }}
-          >
-            {displayData}
-          </div>
-        </div>
-        <div onClick={this.handleClick} style={{ cursor: "pointer" }}>
-          show more...
-        </div>
+          </NavBar>
+          <Table>{displayData}</Table>
+        </Resize>
+        <Pointer onClick={this.handleClick}>show more...</Pointer>
         <div>
           Search:{" "}
           <input
@@ -269,7 +252,7 @@ class NewStories extends React.Component<Props, StateProps> {
             autoComplete="false"
           />
         </div>
-      </div>
+      </Container>
     );
   }
 }
