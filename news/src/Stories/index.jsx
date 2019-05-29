@@ -29,7 +29,7 @@ type StateProps = {
       parent?: number,
       kids: Array<Number>,
       url: string,
-      score: Number,
+      score: number,
       title: string,
       descendants: number
     }
