@@ -12,6 +12,7 @@
 /type-def-libs
 
 [lints]
+deprecated-utility=off
 
 [options]
 all=true

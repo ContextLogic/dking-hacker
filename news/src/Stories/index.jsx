@@ -3,6 +3,7 @@ import axios from "axios";
 import timeago from "epoch-timeago";
 import logo from "../img/y.jpg";
 import { Alert } from "reactstrap";
+import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
@@ -13,12 +14,12 @@ type Props = {
 
 type StateProps = {
   topStories: Array<Number>,
-  searchItem?: string,
+  searchItem: string,
   isMounted?: boolean,
   pageCount?: number,
-  currentPage?: number,
+  currentPage: number,
   todosPerPage: number,
-  promises?: [
+  promises: [
     {
       deleted?: boolean,
       type: string,
@@ -31,7 +32,8 @@ type StateProps = {
       url: string,
       score: number,
       title: string,
-      descendants: number
+      descendants: number,
+      id: number
     }
   ]
 };
@@ -84,11 +86,11 @@ class NewStories extends React.Component<Props, StateProps> {
       });
   }
 
-  handleClick() {
+  handleClick = () => {
     this.setState({
       currentPage: this.state.currentPage + 1
     });
-  }
+  };
 
   componentDidMount() {
     this.getStories("newStories");
