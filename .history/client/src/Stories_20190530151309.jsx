@@ -21,7 +21,7 @@ type StoryProps = {
 
 type StoryState = {
   isMounted: boolean,
-  prevSearchItem: StoryCategories,
+  prevSearchItem: string,
   pageCount?: number,
   storiesPerPage: number,
   listOfStories: Array<{

@@ -1,6 +1,7 @@
 // @flow
 import React from "react";
 import timeago from "epoch-timeago";
+import { Alert } from "reactstrap";
 import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
@@ -21,7 +22,7 @@ type StoryProps = {
 
 type StoryState = {
   isMounted: boolean,
-  prevSearchItem: StoryCategories,
+  prevSearchItem: string,
   pageCount?: number,
   storiesPerPage: number,
   listOfStories: Array<{

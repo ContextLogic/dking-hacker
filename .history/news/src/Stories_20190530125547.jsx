@@ -1,12 +1,14 @@
 // @flow
 import React from "react";
+import axios from "axios";
 import timeago from "epoch-timeago";
+import { Alert } from "reactstrap";
 import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
 
-type StoryCategories =
+type storyCategories =
   | "newstories"
   | "paststories"
   | "comments"
@@ -15,13 +17,13 @@ type StoryCategories =
   | "jobstories";
 
 type StoryProps = {
-  searchItem: StoryCategories,
+  searchItem: storyCategories,
   currentPage: number
 };
 
 type StoryState = {
   isMounted: boolean,
-  prevSearchItem: StoryCategories,
+  prevStories: string,
   pageCount?: number,
   storiesPerPage: number,
   listOfStories: Array<{
@@ -48,30 +50,30 @@ class Stories extends React.Component<StoryProps, StoryState> {
       listOfStories: [{}],
       isMounted: false,
       storiesPerPage: 30,
-      prevSearchItem: ""
+      prevStories: ""
     };
   }
 
   // Onclick change the data onscreen by setting the state of the search item
   async getStories() {
-    const requestForStories = await fetch(
+    const stories = await fetch(
       `https://hacker-news.firebaseio.com/v0/${
         this.props.searchItem
       }.json?print=pretty`
     );
-    const storyIds = await requestForStories.json();
-    const listOfStoriesPromises = storyIds.map(story => {
+    const storyIds = await stories.json();
+    const listOfStories = storyIds.map(story => {
       return fetch(`${base}${story}${extension}`).then(response =>
         response.json()
       );
     });
-    const listOfStories = await Promise.all(listOfStoriesPromises);
-
-    this.setState({
-      listOfStories: listOfStories,
-      isMounted: true,
-      pageCount: listOfStories.length / 10,
-      prevSearchItem: this.props.searchItem
+    Promise.all(listOfStories).then(data => {
+      this.setState({
+        listOfStories: data,
+        isMounted: true,
+        pageCount: data.length / 10,
+        prevStories: this.props.searchItem
+      });
     });
   }
 
@@ -80,7 +82,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
   }
 
   componentDidUpdate() {
-    if (this.props.searchItem !== this.state.prevSearchItem) {
+    if (this.props.searchItem !== this.state.prevStories) {
       this.getStories();
     }
   }
@@ -90,7 +92,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
     const { currentPage } = this.props;
     const indexOfLastStory = currentPage * storiesPerPage;
     const indexOfFirstStory = indexOfLastStory - storiesPerPage;
-    const displayedStories = this.state.listOfStories.slice(
+    const currentStories = this.state.listOfStories.slice(
       indexOfFirstStory,
       indexOfLastStory
     );
@@ -110,7 +112,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
 
     let displayData =
       this.state.isMounted === true ? (
-        displayedStories.map(
+        currentStories.map(
           (story, index) =>
             story && (
               <div key={story.id}>

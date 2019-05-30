@@ -1,6 +1,7 @@
 // @flow
 import React from "react";
 import timeago from "epoch-timeago";
+import { Alert } from "reactstrap";
 import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
@@ -21,7 +22,7 @@ type StoryProps = {
 
 type StoryState = {
   isMounted: boolean,
-  prevSearchItem: StoryCategories,
+  prevStories: string,
   pageCount?: number,
   storiesPerPage: number,
   listOfStories: Array<{
@@ -48,7 +49,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
       listOfStories: [{}],
       isMounted: false,
       storiesPerPage: 30,
-      prevSearchItem: ""
+      prevStories: ""
     };
   }
 
@@ -71,7 +72,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
       listOfStories: listOfStories,
       isMounted: true,
       pageCount: listOfStories.length / 10,
-      prevSearchItem: this.props.searchItem
+      prevStories: this.props.searchItem
     });
   }
 
@@ -80,7 +81,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
   }
 
   componentDidUpdate() {
-    if (this.props.searchItem !== this.state.prevSearchItem) {
+    if (this.props.searchItem !== this.state.prevStories) {
       this.getStories();
     }
   }

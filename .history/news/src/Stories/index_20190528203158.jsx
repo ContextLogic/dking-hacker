@@ -1,0 +1,251 @@
+import React from "react";
+import axios from "axios";
+import timeago from "epoch-timeago";
+import logo from "../img/y.jpg";
+
+const base = " https://hacker-news.firebaseio.com/v0/item/",
+  extension = ".json?print=pretty";
+
+type props = {
+  searchTerm: string
+};
+
+type StateProps = {
+  topStories: Array<Number>,
+  promises: Array<Object>,
+  searchItem: string,
+  isMounted: boolean,
+  pageCount: number,
+  currentPage: number,
+  todosPerPage: number
+};
+
+class newStories extends React.Component<props, StateProps> {
+  _isMounted = false;
+  constructor() {
+    super();
+    this.state = {
+      searchItem: "newstories",
+      topStories: [],
+      promises: [{}],
+      isMounted: false,
+      currentPage: 1,
+      todosPerPage: 30
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  // Onclick change the data onscreen by setting the state of the search item
+  getStories(searchItem: string) {
+    this.setState({ searchItem: searchItem });
+  }
+
+  handleClick() {
+    this.setState({
+      currentPage: this.state.currentPage + 1
+    });
+  }
+
+  componentDidMount() {
+    const { searchItem } = this.state;
+    axios
+      .get(
+        "https://hacker-news.firebaseio.com/v0/" +
+          searchItem +
+          ".json?print=pretty"
+      )
+      .then(result => {
+        // Store category ids
+        const topStories = result.data;
+        const promises = topStories.map(story => {
+          return axios.get(base + story + extension).then(res => res.data);
+        });
+        Promise.all(promises).then(data => {
+          console.log(data);
+          this.setState({
+            promises: data,
+            isMounted: true,
+            pageCount: data.length / 10
+          });
+        });
+      });
+  }
+  render() {
+    const navStyle = {
+      display: "flex",
+      placeContent: "center",
+      items: "center",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      listStyle: "none",
+      justifyContent: "flex-start",
+      placeContent: "flex-start",
+      width: "100%",
+      height: "25px",
+      backgroundColor: "#f4783a"
+    };
+
+    const { currentPage, todosPerPage } = this.state;
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = this.state.promises.slice(
+      indexOfFirstTodo,
+      indexOfLastTodo
+    );
+
+    const TimeAgo = ({ time }) => (
+      <time dateTime={new Date(time).toISOString()}>{timeago(time)}</time>
+    );
+
+    function getTime(time: number) {
+      const epochTimeStamp = Date.now() - time;
+      return (
+        <div>
+          <TimeAgo time={epochTimeStamp} />
+        </div>
+      );
+    }
+
+    let displayData =
+      this.state.isMounted === true ? (
+        currentTodos.map(
+          (stories, index) =>
+            stories && (
+              <div key={stories.id}>
+                <a
+                  style={{ textDecoration: "none", color: "black" }}
+                  href={stories.url}
+                >
+                  {index + 1}. {stories.title}{" "}
+                </a>
+                <div
+                  style={{ fontSize: "10px", display: "flex", color: "grey" }}
+                >
+                  &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  {stories.score} points by {stories.by}&nbsp; &nbsp;{" "}
+                  {getTime(stories.time)} | hide | {stories.descendants}{" "}
+                  comments
+                </div>
+              </div>
+            )
+        )
+      ) : (
+        <h3>Loading data</h3>
+      );
+
+    const renderPageNumbers = () => (
+      <div
+        style={{ listStyle: "none", color: "black" }}
+        onClick={this.handleClick}
+      >
+        show more
+      </div>
+    );
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}
+      >
+        <div
+          style={{
+            width: "70%"
+          }}
+        >
+          <ul style={navStyle}>
+            <img
+              src={logo}
+              alt="logo"
+              style={{ border: "solid white 0.2px" }}
+            />
+            <li>
+              &nbsp;<b>Hacker News</b>&nbsp;&nbsp;
+            </li>
+            {
+              <li style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("new")}> new&nbsp;|</a>
+              </li>
+            }
+            {
+              <li style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("past")}>
+                  &nbsp; past &nbsp;|
+                </a>
+              </li>
+            }
+            {
+              <li style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("comments")}>
+                  &nbsp;comments &nbsp;|
+                </a>
+              </li>
+            }
+            {
+              <li style={{ cursor: "pointer" }}>
+                <div onClick={() => this.getStories("askstories")}>
+                  &nbsp;ask &nbsp;|
+                </div>
+              </li>
+            }
+            {
+              <li style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("showstories")}>
+                  &nbsp; show &nbsp;|
+                </a>
+              </li>
+            }
+            {
+              <li style={{ cursor: "pointer" }}>
+                <a onClick={() => this.getStories("jobstories")}>
+                  &nbsp; jobs &nbsp;|
+                </a>
+              </li>
+            }
+            {
+              <li style={{ cursor: "pointer" }}>
+                <a
+                  href="https://www.mcdonalds.com/us/en-us.html"
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  &nbsp;submit
+                </a>
+              </li>
+            }
+          </ul>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              flexDirection: "column",
+              background: "#ffccb3",
+              flex: 1
+            }}
+          >
+            {displayData}
+          </div>
+        </div>
+        <div onClick={this.handleClick} style={{ cursor: "pointer" }}>
+          show more...
+        </div>
+        <div>
+          Search:{" "}
+          <input
+            type="text"
+            name="q"
+            placeholder=""
+            size="17"
+            autoCorrect="off"
+            spellCheck="false"
+            autoCapitalize="off"
+            autoComplete="false"
+          />
+        </div>
+      </div>
+    );
+  }
+}
+export default newStories;

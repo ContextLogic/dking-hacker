@@ -1,29 +1,24 @@
 // @flow
 import React from "react";
+import axios from "axios";
 import timeago from "epoch-timeago";
+import { Alert } from "reactstrap";
 import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
 
-type StoryCategories =
-  | "newstories"
-  | "paststories"
-  | "comments"
-  | "askstories"
-  | "showstories"
-  | "jobstories";
-
 type StoryProps = {
-  searchItem: StoryCategories,
+  searchItem: string,
   currentPage: number
 };
 
 type StoryState = {
+  topStories: Array<number>,
   isMounted: boolean,
-  prevSearchItem: StoryCategories,
+  prevProps: string,
   pageCount?: number,
-  storiesPerPage: number,
+  todosPerPage: number,
   listOfStories: Array<{
     deleted?: boolean,
     type: string,
@@ -45,34 +40,42 @@ class Stories extends React.Component<StoryProps, StoryState> {
   constructor(props: StoryProps) {
     super(props);
     this.state = {
+      topStories: [],
       listOfStories: [{}],
       isMounted: false,
-      storiesPerPage: 30,
-      prevSearchItem: ""
+      todosPerPage: 30,
+      prevProps: ""
     };
   }
 
   // Onclick change the data onscreen by setting the state of the search item
-  async getStories() {
-    const requestForStories = await fetch(
-      `https://hacker-news.firebaseio.com/v0/${
-        this.props.searchItem
-      }.json?print=pretty`
-    );
-    const storyIds = await requestForStories.json();
-    const listOfStoriesPromises = storyIds.map(story => {
-      return fetch(`${base}${story}${extension}`).then(response =>
-        response.json()
-      );
-    });
-    const listOfStories = await Promise.all(listOfStoriesPromises);
-
-    this.setState({
-      listOfStories: listOfStories,
-      isMounted: true,
-      pageCount: listOfStories.length / 10,
-      prevSearchItem: this.props.searchItem
-    });
+  getStories() {
+    axios
+      .get(
+        `https://hacker-news.firebaseio.com/v0/${
+          this.props.searchItem
+        }.json?print=pretty`
+      )
+      .then(result => {
+        // Store category ids
+        const topStories = result.data;
+        const listOfStories = topStories.map(story => {
+          return axios.get(base + story + extension).then(res => res.data);
+        });
+        Promise.all(listOfStories).then(data => {
+          this.setState({
+            listOfStories: data,
+            isMounted: true,
+            pageCount: data.length / 10,
+            prevProps: this.props.searchItem
+          });
+        });
+      })
+      .catch(error => {
+        return (
+          <Alert color="primary">Your request failed please try again! </Alert>
+        );
+      });
   }
 
   componentDidMount() {
@@ -80,19 +83,19 @@ class Stories extends React.Component<StoryProps, StoryState> {
   }
 
   componentDidUpdate() {
-    if (this.props.searchItem !== this.state.prevSearchItem) {
+    if (this.props.searchItem !== this.state.prevProps) {
       this.getStories();
     }
   }
 
   render() {
-    const { storiesPerPage } = this.state;
+    const { todosPerPage } = this.state;
     const { currentPage } = this.props;
-    const indexOfLastStory = currentPage * storiesPerPage;
-    const indexOfFirstStory = indexOfLastStory - storiesPerPage;
-    const displayedStories = this.state.listOfStories.slice(
-      indexOfFirstStory,
-      indexOfLastStory
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = this.state.listOfStories.slice(
+      indexOfFirstTodo,
+      indexOfLastTodo
     );
 
     const TimeAgo = ({ time }) => (
@@ -110,17 +113,18 @@ class Stories extends React.Component<StoryProps, StoryState> {
 
     let displayData =
       this.state.isMounted === true ? (
-        displayedStories.map(
-          (story, index) =>
-            story && (
-              <div key={story.id}>
-                <Anchor href={story.url}>
-                  {index + 1}. {story.title}{" "}
+        currentTodos.map(
+          (stories, index) =>
+            stories && (
+              <div key={stories.id}>
+                <Anchor href={stories.url}>
+                  {index + 1}. {stories.title}{" "}
                 </Anchor>
                 <Story>
                   &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  {story.score} points by {story.by}&nbsp; &nbsp;{" "}
-                  {getTime(story.time)} | hide | {story.descendants} comments
+                  {stories.score} points by {stories.by}&nbsp; &nbsp;{" "}
+                  {getTime(stories.time)} | hide | {stories.descendants}{" "}
+                  comments
                 </Story>
               </div>
             )
@@ -129,12 +133,12 @@ class Stories extends React.Component<StoryProps, StoryState> {
         <h3>Loading data</h3>
       );
 
-    return <ListOfStories>{displayData}</ListOfStories>;
+    return <Table>{displayData}</Table>;
   }
 }
 export default Stories;
 
-const ListOfStories = styled.div`
+const Table = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;

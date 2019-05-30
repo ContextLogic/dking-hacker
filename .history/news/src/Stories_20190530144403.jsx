@@ -1,12 +1,13 @@
 // @flow
 import React from "react";
 import timeago from "epoch-timeago";
+import { Alert } from "reactstrap";
 import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
 
-type StoryCategories =
+type storyCategories =
   | "newstories"
   | "paststories"
   | "comments"
@@ -15,13 +16,13 @@ type StoryCategories =
   | "jobstories";
 
 type StoryProps = {
-  searchItem: StoryCategories,
+  searchItem: storyCategories,
   currentPage: number
 };
 
 type StoryState = {
   isMounted: boolean,
-  prevSearchItem: StoryCategories,
+  prevStories: string,
   pageCount?: number,
   storiesPerPage: number,
   listOfStories: Array<{
@@ -48,7 +49,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
       listOfStories: [{}],
       isMounted: false,
       storiesPerPage: 30,
-      prevSearchItem: ""
+      prevStories: ""
     };
   }
 
@@ -60,18 +61,18 @@ class Stories extends React.Component<StoryProps, StoryState> {
       }.json?print=pretty`
     );
     const storyIds = await requestForStories.json();
-    const listOfStoriesPromises = storyIds.map(story => {
+    const listOfStories = storyIds.map(story => {
       return fetch(`${base}${story}${extension}`).then(response =>
         response.json()
       );
     });
-    const listOfStories = await Promise.all(listOfStoriesPromises);
-
-    this.setState({
-      listOfStories: listOfStories,
-      isMounted: true,
-      pageCount: listOfStories.length / 10,
-      prevSearchItem: this.props.searchItem
+    Promise.all(listOfStories).then(data => {
+      this.setState({
+        listOfStories: data,
+        isMounted: true,
+        pageCount: data.length / 10,
+        prevStories: this.props.searchItem
+      });
     });
   }
 
@@ -80,7 +81,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
   }
 
   componentDidUpdate() {
-    if (this.props.searchItem !== this.state.prevSearchItem) {
+    if (this.props.searchItem !== this.state.prevStories) {
       this.getStories();
     }
   }
