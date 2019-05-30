@@ -34,8 +34,8 @@ class Nav extends React.Component<NavProps, NavState> {
     });
   };
 
-  changeStories(data: storyCategories) {
-    this.setState({ searchItem: data });
+  changeStories(storyCategory: storyCategories) {
+    this.setState({ searchItem: storyCategory });
   }
 
   render() {

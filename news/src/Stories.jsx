@@ -55,33 +55,26 @@ class Stories extends React.Component<StoryProps, StoryState> {
   }
 
   // Onclick change the data onscreen by setting the state of the search item
-  getStories() {
-    axios
-      .get(
-        `https://hacker-news.firebaseio.com/v0/${
-          this.props.searchItem
-        }.json?print=pretty`
-      )
-      .then(result => {
-        // Store category ids
-        const requestedStories = result.data;
-        const listOfStories = requestedStories.map(story => {
-          return axios.get(`${base}${story}${extension}`).then(res => res.data);
-        });
-        Promise.all(listOfStories).then(data => {
-          this.setState({
-            listOfStories: data,
-            isMounted: true,
-            pageCount: data.length / 10,
-            prevStories: this.props.searchItem
-          });
-        });
-      })
-      .catch(error => {
-        return (
-          <Alert color="primary">Your request failed please try again! </Alert>
-        );
+  async getStories() {
+    const requestForStories = await fetch(
+      `https://hacker-news.firebaseio.com/v0/${
+        this.props.searchItem
+      }.json?print=pretty`
+    );
+    const storyIds = await requestForStories.json();
+    const listOfStories = storyIds.map(story => {
+      return fetch(`${base}${story}${extension}`).then(response =>
+        response.json()
+      );
+    });
+    Promise.all(listOfStories).then(data => {
+      this.setState({
+        listOfStories: data,
+        isMounted: true,
+        pageCount: data.length / 10,
+        prevStories: this.props.searchItem
       });
+    });
   }
 
   componentDidMount() {
