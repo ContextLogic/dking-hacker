@@ -27,10 +27,7 @@ class Nav extends React.Component<Props, StateProps> {
   };
 
   changeData(data: string) {
-    console.log(this.state.searchItem, "state before it is changed");
     this.setState({ searchItem: data });
-    console.log(data, "this is passed");
-    console.log(this.state.searchItem, "this is saved to search item");
   }
 
   render() {

@@ -47,8 +47,6 @@ class NewStories extends React.Component<Props, StateProps> {
 
   // Onclick change the data onscreen by setting the state of the search item
   getStories() {
-    //const { searchItem } = this.props;
-    console.log(this.props.searchItem);
     axios
       .get(
         "https://hacker-news.firebaseio.com/v0/" +
@@ -62,7 +60,6 @@ class NewStories extends React.Component<Props, StateProps> {
           return axios.get(base + story + extension).then(res => res.data);
         });
         Promise.all(listOfStories).then(data => {
-          console.log(data);
           this.setState({
             listOfStories: data,
             isMounted: true,
