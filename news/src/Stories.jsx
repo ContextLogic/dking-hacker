@@ -8,17 +8,24 @@ import styled from "styled-components";
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
 
+type storyCategories =
+  | "newstories"
+  | "paststories"
+  | "comments"
+  | "askstories"
+  | "showstories"
+  | "jobstories";
+
 type StoryProps = {
-  searchItem: string,
+  searchItem: storyCategories,
   currentPage: number
 };
 
 type StoryState = {
-  topStories: Array<number>,
   isMounted: boolean,
-  prevProps: string,
+  prevStories: string,
   pageCount?: number,
-  todosPerPage: number,
+  storiesPerPage: number,
   listOfStories: Array<{
     deleted?: boolean,
     type: string,
@@ -40,11 +47,10 @@ class Stories extends React.Component<StoryProps, StoryState> {
   constructor(props: StoryProps) {
     super(props);
     this.state = {
-      topStories: [],
       listOfStories: [{}],
       isMounted: false,
-      todosPerPage: 30,
-      prevProps: ""
+      storiesPerPage: 30,
+      prevStories: ""
     };
   }
 
@@ -52,22 +58,22 @@ class Stories extends React.Component<StoryProps, StoryState> {
   getStories() {
     axios
       .get(
-        "https://hacker-news.firebaseio.com/v0/" +
-          this.props.searchItem +
-          ".json?print=pretty"
+        `https://hacker-news.firebaseio.com/v0/${
+          this.props.searchItem
+        }.json?print=pretty`
       )
       .then(result => {
         // Store category ids
-        const topStories = result.data;
-        const listOfStories = topStories.map(story => {
-          return axios.get(base + story + extension).then(res => res.data);
+        const requestedStories = result.data;
+        const listOfStories = requestedStories.map(story => {
+          return axios.get(`${base}${story}${extension}`).then(res => res.data);
         });
         Promise.all(listOfStories).then(data => {
           this.setState({
             listOfStories: data,
             isMounted: true,
             pageCount: data.length / 10,
-            prevProps: this.props.searchItem
+            prevStories: this.props.searchItem
           });
         });
       })
@@ -83,19 +89,19 @@ class Stories extends React.Component<StoryProps, StoryState> {
   }
 
   componentDidUpdate() {
-    if (this.props.searchItem !== this.state.prevProps) {
+    if (this.props.searchItem !== this.state.prevStories) {
       this.getStories();
     }
   }
 
   render() {
-    const { todosPerPage } = this.state;
+    const { storiesPerPage } = this.state;
     const { currentPage } = this.props;
-    const indexOfLastTodo = currentPage * todosPerPage;
-    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-    const currentTodos = this.state.listOfStories.slice(
-      indexOfFirstTodo,
-      indexOfLastTodo
+    const indexOfLastStory = currentPage * storiesPerPage;
+    const indexOfFirstStory = indexOfLastStory - storiesPerPage;
+    const currentStories = this.state.listOfStories.slice(
+      indexOfFirstStory,
+      indexOfLastStory
     );
 
     const TimeAgo = ({ time }) => (
@@ -113,18 +119,17 @@ class Stories extends React.Component<StoryProps, StoryState> {
 
     let displayData =
       this.state.isMounted === true ? (
-        currentTodos.map(
-          (stories, index) =>
-            stories && (
-              <div key={stories.id}>
-                <Anchor href={stories.url}>
-                  {index + 1}. {stories.title}{" "}
+        currentStories.map(
+          (story, index) =>
+            story && (
+              <div key={story.id}>
+                <Anchor href={story.url}>
+                  {index + 1}. {story.title}{" "}
                 </Anchor>
                 <Story>
                   &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  {stories.score} points by {stories.by}&nbsp; &nbsp;{" "}
-                  {getTime(stories.time)} | hide | {stories.descendants}{" "}
-                  comments
+                  {story.score} points by {story.by}&nbsp; &nbsp;{" "}
+                  {getTime(story.time)} | hide | {story.descendants} comments
                 </Story>
               </div>
             )
@@ -133,12 +138,12 @@ class Stories extends React.Component<StoryProps, StoryState> {
         <h3>Loading data</h3>
       );
 
-    return <Table>{displayData}</Table>;
+    return <ListOfStories>{displayData}</ListOfStories>;
   }
 }
 export default Stories;
 
-const Table = styled.div`
+const ListOfStories = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;

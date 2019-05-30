@@ -4,10 +4,18 @@ import logo from "./img/y.jpg";
 import styled from "styled-components";
 import Stories from "./Stories";
 
+type storyCategories =
+  | "newstories"
+  | "paststories"
+  | "comments"
+  | "askstories"
+  | "showstories"
+  | "jobstories";
+
 type NavProps = {};
 
 type NavState = {
-  searchItem: string,
+  searchItem: storyCategories,
   currentPage: number
 };
 
@@ -26,7 +34,7 @@ class Nav extends React.Component<NavProps, NavState> {
     });
   };
 
-  changeData(data: string) {
+  changeStories(data: storyCategories) {
     this.setState({ searchItem: data });
   }
 
@@ -40,32 +48,32 @@ class Nav extends React.Component<NavProps, NavState> {
               &nbsp;<b>Hacker News</b>&nbsp;&nbsp;
             </div>
             {
-              <Category onClick={() => this.changeData("newstories")}>
+              <Category onClick={() => this.changeStories("newstories")}>
                 new &nbsp;|
               </Category>
             }
             {
-              <Category onClick={() => this.changeData("paststories")}>
+              <Category onClick={() => this.changeStories("paststories")}>
                 &nbsp; past &nbsp;|
               </Category>
             }
             {
-              <Category onClick={() => this.changeData("comments")}>
+              <Category onClick={() => this.changeStories("comments")}>
                 &nbsp;comments &nbsp;|
               </Category>
             }
             {
-              <Category onClick={() => this.changeData("askstories")}>
+              <Category onClick={() => this.changeStories("askstories")}>
                 &nbsp;ask &nbsp;|
               </Category>
             }
             {
-              <Category onClick={() => this.changeData("showstories")}>
+              <Category onClick={() => this.changeStories("showstories")}>
                 &nbsp; show &nbsp;|
               </Category>
             }
             {
-              <Category onClick={() => this.changeData("jobstories")}>
+              <Category onClick={() => this.changeStories("jobstories")}>
                 &nbsp; jobs &nbsp;|
               </Category>
             }
@@ -82,7 +90,7 @@ class Nav extends React.Component<NavProps, NavState> {
             currentPage={this.state.currentPage}
           />
         </FeedContainer>
-        <Category onClick={this.handleClick}>show more...</Category>
+        <MoreStories onClick={this.handleClick}>show more...</MoreStories>
         <div>
           Search:{" "}
           <input
@@ -121,6 +129,10 @@ const NavBar = styled.div`
 `;
 
 const Category = styled.div`
+  cursor: pointer;
+`;
+
+const MoreStories = styled.div`
   cursor: pointer;
 `;
 
