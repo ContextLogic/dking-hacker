@@ -8,14 +8,15 @@ import styled from "styled-components";
 const base = " https://hacker-news.firebaseio.com/v0/item/",
   extension = ".json?print=pretty";
 
-type Props = {
+type StoryProps = {
   searchItem: string,
   currentPage: number
 };
 
-type StateProps = {
+type StoryState = {
   topStories: Array<number>,
   isMounted: boolean,
+  prevProps: string,
   pageCount?: number,
   todosPerPage: number,
   listOfStories: Array<{
@@ -35,14 +36,15 @@ type StateProps = {
   }>
 };
 
-class Stories extends React.Component<Props, StateProps> {
-  constructor() {
-    super();
+class Stories extends React.Component<StoryProps, StoryState> {
+  constructor(props: StoryProps) {
+    super(props);
     this.state = {
       topStories: [],
       listOfStories: [{}],
       isMounted: false,
-      todosPerPage: 30
+      todosPerPage: 30,
+      prevProps: ""
     };
   }
 
@@ -64,7 +66,8 @@ class Stories extends React.Component<Props, StateProps> {
           this.setState({
             listOfStories: data,
             isMounted: true,
-            pageCount: data.length / 10
+            pageCount: data.length / 10,
+            prevProps: this.props.searchItem
           });
         });
       })
@@ -79,10 +82,9 @@ class Stories extends React.Component<Props, StateProps> {
     this.getStories();
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.searchItem !== prevProps) {
-      // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
-      this.getStories(prevProps);
+  componentDidUpdate() {
+    if (this.props.searchItem !== this.state.prevProps) {
+      this.getStories();
     }
   }
 

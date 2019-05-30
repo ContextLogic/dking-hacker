@@ -4,21 +4,20 @@ import logo from "./img/y.jpg";
 import styled from "styled-components";
 import Stories from "./Stories";
 
-type Props = {};
+type NavProps = {};
 
-type StateProps = {
+type NavState = {
   searchItem: string,
   currentPage: number
 };
 
-class Nav extends React.Component<Props, StateProps> {
-  constructor() {
-    super();
+class Nav extends React.Component<NavProps, NavState> {
+  constructor(props: NavProps) {
+    super(props);
     this.state = {
       searchItem: "newstories",
       currentPage: 1
     };
-    this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick = () => {
@@ -138,4 +137,8 @@ const Container = styled.div`
 
 const FeedContainer = styled.div`
   width: 80%;
+
+  @media (max-width: 700px) {
+    width: 100%;
+  }
 `;
