@@ -1,6 +1,5 @@
 // @flow
 import React from "react";
-import axios from "axios";
 import timeago from "epoch-timeago";
 import { Alert } from "reactstrap";
 import styled from "styled-components";
