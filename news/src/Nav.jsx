@@ -1,7 +1,8 @@
+// @flow
 import React from "react";
 import logo from "./img/y.jpg";
 import styled from "styled-components";
-import Stories from "./stories";
+import Stories from "./Stories";
 
 type Props = {};
 
@@ -33,56 +34,56 @@ class Nav extends React.Component<Props, StateProps> {
   render() {
     return (
       <Container>
-        <Resize>
+        <FeedContainer>
           <NavBar>
             <Logo src={logo} alt="logo" />
             <div>
               &nbsp;<b>Hacker News</b>&nbsp;&nbsp;
             </div>
             {
-              <Categories onClick={() => this.changeData("newstories")}>
+              <Category onClick={() => this.changeData("newstories")}>
                 new &nbsp;|
-              </Categories>
+              </Category>
             }
             {
-              <Categories onClick={() => this.changeData("paststories")}>
+              <Category onClick={() => this.changeData("paststories")}>
                 &nbsp; past &nbsp;|
-              </Categories>
+              </Category>
             }
             {
-              <Categories onClick={() => this.changeData("comments")}>
+              <Category onClick={() => this.changeData("comments")}>
                 &nbsp;comments &nbsp;|
-              </Categories>
+              </Category>
             }
             {
-              <Categories onClick={() => this.changeData("askstories")}>
+              <Category onClick={() => this.changeData("askstories")}>
                 &nbsp;ask &nbsp;|
-              </Categories>
+              </Category>
             }
             {
-              <Categories onClick={() => this.changeData("showstories")}>
+              <Category onClick={() => this.changeData("showstories")}>
                 &nbsp; show &nbsp;|
-              </Categories>
+              </Category>
             }
             {
-              <Categories onClick={() => this.changeData("jobstories")}>
+              <Category onClick={() => this.changeData("jobstories")}>
                 &nbsp; jobs &nbsp;|
-              </Categories>
+              </Category>
             }
             {
-              <Categories>
+              <Category>
                 <Anchor href="https://www.mcdonalds.com/us/en-us.html">
                   &nbsp;submit
                 </Anchor>
-              </Categories>
+              </Category>
             }
           </NavBar>
           <Stories
             searchItem={this.state.searchItem}
             currentPage={this.state.currentPage}
           />
-        </Resize>
-        <Categories onClick={this.handleClick}>show more...</Categories>
+        </FeedContainer>
+        <Category onClick={this.handleClick}>show more...</Category>
         <div>
           Search:{" "}
           <input
@@ -120,7 +121,7 @@ const NavBar = styled.div`
   background-color: #f4783a;
 `;
 
-const Categories = styled.div`
+const Category = styled.div`
   cursor: pointer;
 `;
 
@@ -135,6 +136,6 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const Resize = styled.div`
+const FeedContainer = styled.div`
   width: 80%;
 `;

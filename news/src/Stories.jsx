@@ -1,3 +1,4 @@
+// @flow
 import React from "react";
 import axios from "axios";
 import timeago from "epoch-timeago";
@@ -34,7 +35,7 @@ type StateProps = {
   }>
 };
 
-class NewStories extends React.Component<Props, StateProps> {
+class Stories extends React.Component<Props, StateProps> {
   constructor() {
     super();
     this.state = {
@@ -77,6 +78,14 @@ class NewStories extends React.Component<Props, StateProps> {
   componentDidMount() {
     this.getStories();
   }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.searchItem !== prevProps) {
+      // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
+      this.getStories(prevProps);
+    }
+  }
+
   render() {
     const { todosPerPage } = this.state;
     const { currentPage } = this.props;
@@ -125,7 +134,7 @@ class NewStories extends React.Component<Props, StateProps> {
     return <Table>{displayData}</Table>;
   }
 }
-export default NewStories;
+export default Stories;
 
 const Table = styled.div`
   display: flex;
