@@ -1,7 +1,6 @@
 // @flow
 import React from "react";
 import timeago from "epoch-timeago";
-import { Alert } from "reactstrap";
 import styled from "styled-components";
 
 const base = " https://hacker-news.firebaseio.com/v0/item/",
