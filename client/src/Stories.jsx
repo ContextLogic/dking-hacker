@@ -3,9 +3,6 @@ import React from "react";
 import timeago from "epoch-timeago";
 import styled from "styled-components";
 
-const base = " https://hacker-news.firebaseio.com/v0/item/",
-  extension = ".json?print=pretty";
-
 type StoryCategories =
   | "newstories"
   | "paststories"
@@ -48,24 +45,16 @@ class Stories extends React.Component<StoryProps, StoryState> {
       listOfStories: [{}],
       isMounted: false,
       storiesPerPage: 30,
-      prevSearchItem: ""
+      prevSearchItem: "jobstories"
     };
   }
 
   // Onclick change the data onscreen by setting the state of the search item
   async getStories() {
     const requestForStories = await fetch(
-      `https://hacker-news.firebaseio.com/v0/${
-        this.props.searchItem
-      }.json?print=pretty`
+      `http://localhost:8888/stories/${this.props.searchItem}`
     );
-    const storyIds = await requestForStories.json();
-    const listOfStoriesPromises = storyIds.map(story => {
-      return fetch(`${base}${story}${extension}`).then(response =>
-        response.json()
-      );
-    });
-    const listOfStories = await Promise.all(listOfStoriesPromises);
+    const listOfStories = await requestForStories.json();
 
     this.setState({
       listOfStories: listOfStories,
