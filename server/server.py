@@ -6,114 +6,117 @@ import aiohttp
 import json
 from bson import json_util
 
+
 async def fetch(session, url):
     async with session.get(url) as response:
         if response.status == 200 and response is not None:
             return await response.json()
 
+
 class NewStoriesHandler(tornado.web.RequestHandler):
     async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         loop = asyncio.get_event_loop()
-        ids = loop.run_in_executor(None, requests.get, 'https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty')
+        ids = loop.run_in_executor(
+            None, requests.get, 'https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty')
         response = await ids
-        response_data = response.json()
-        response_data = set(response_data)
-        print(response.text)
+        response_data = set(response.json())
         tasks = []
         async with aiohttp.ClientSession() as session:
             for url in response_data:
                 tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
                     url)))
             story_list = await asyncio.gather(*tasks)
-
-        print(story_list)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
 
 
 class PastStoriesHandler(tornado.web.RequestHandler):
-    def get(self):
+    async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        response = requests.get(
-            "https://hacker-news.firebaseio.com/v0/paststories.json?print=pretty")
-        data = response.json()
-        story_list = []
-        for story in data:
-            temp_string = "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
-                story)
-            story_data = requests.get(temp_string)
-            story_list.append(story_data.json())
-        print(story_list)
+        loop = asyncio.get_event_loop()
+        ids = loop.run_in_executor(
+            None, requests.get, 'https://hacker-news.firebaseio.com/v0/paststories.json?print=pretty')
+        response = await ids
+        response_data = set(response.json())
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            for url in response_data:
+                tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
+                    url)))
+            story_list = await asyncio.gather(*tasks)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
 
 
 class CommentHandler(tornado.web.RequestHandler):
-    def get(self):
+    async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        response = requests.get(
-            "https://hacker-news.firebaseio.com/v0/comments.json?print=pretty")
-        data = response.json()
-        story_list = []
-        for story in data:
-            temp_string = "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
-                story)
-            story_data = requests.get(temp_string)
-            story_list.append(story_data.json())
-        print(story_list)
+        loop = asyncio.get_event_loop()
+        ids = loop.run_in_executor(
+            None, requests.get, 'https://hacker-news.firebaseio.com/v0/comments.json?print=pretty')
+        response = await ids
+        response_data = set(response.json())
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            for url in response_data:
+                tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
+                    url)))
+            story_list = await asyncio.gather(*tasks)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
 
 
 class AskStoriesHandler(tornado.web.RequestHandler):
-
-    def get(self):
+    async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        response = requests.get(
-            "https://hacker-news.firebaseio.com/v0/askstories.json?print=pretty")
-        data = response.json()
-        story_list = []
-        for story in data:
-            temp_string = "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
-                story)
-            story_data = requests.get(temp_string)
-            story_list.append(story_data.json())
-        print(story_list)
+        loop = asyncio.get_event_loop()
+        ids = loop.run_in_executor(
+            None, requests.get, 'https://hacker-news.firebaseio.com/v0/askstories.json?print=pretty')
+        response = await ids
+        response_data = set(response.json())
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            for url in response_data:
+                tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
+                    url)))
+            story_list = await asyncio.gather(*tasks)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
 
 
 class JobsHandler(tornado.web.RequestHandler):
-    def get(self):
+    async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        response = requests.get(
-            "https://hacker-news.firebaseio.com/v0/jobstories.json?print=pretty")
-        data = response.json()
-        story_list = []
-        for story in data:
-            temp_string = "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
-                story)
-            story_data = requests.get(temp_string)
-            story_list.append(story_data.json())
-        print(story_list)
+        loop = asyncio.get_event_loop()
+        ids = loop.run_in_executor(
+            None, requests.get, 'https://hacker-news.firebaseio.com/v0/jobstories.json?print=pretty')
+        response = await ids
+        response_data = set(response.json())
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            for url in response_data:
+                tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
+                    url)))
+            story_list = await asyncio.gather(*tasks)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
 
 
 class ShowStoriesHandler(tornado.web.RequestHandler):
-    def get(self):
+    async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        response = requests.get(
-            "https://hacker-news.firebaseio.com/v0/showstories.json?print=pretty")
-        data = response.json()
-        story_list = []
-        for story in data:
-            temp_string = "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
-                story)
-            story_data = requests.get(temp_string)
-            story_list.append(story_data.json())
-        print(story_list)
+        loop = asyncio.get_event_loop()
+        ids = loop.run_in_executor(
+            None, requests.get, 'https://hacker-news.firebaseio.com/v0/showstories.json?print=pretty')
+        response = await ids
+        response_data = set(response.json())
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            for url in response_data:
+                tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
+                    url)))
+            story_list = await asyncio.gather(*tasks)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
 
