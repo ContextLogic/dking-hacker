@@ -55,7 +55,6 @@ class Stories extends React.Component<StoryProps, StoryState> {
       `http://localhost:8888/stories/${this.props.searchItem}`
     );
     const listOfStories = await requestForStories.json();
-
     this.setState({
       listOfStories: listOfStories,
       isMounted: true,

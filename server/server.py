@@ -2,22 +2,31 @@ import tornado.ioloop
 import tornado.web
 import requests
 import asyncio
+import aiohttp
 import json
 from bson import json_util
 
+async def fetch(session, url):
+    async with session.get(url) as response:
+        if response.status == 200 and response is not None:
+            return await response.json()
 
 class NewStoriesHandler(tornado.web.RequestHandler):
-    def get(self):
+    async def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        response = requests.get(
-            "https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty")
-        data = response.json()
-        story_list = []
-        for story in data:
-            temp_string = "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
-                story)
-            story_data = requests.get(temp_string)
-            story_list.append(story_data.json())
+        loop = asyncio.get_event_loop()
+        ids = loop.run_in_executor(None, requests.get, 'https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty')
+        response = await ids
+        response_data = response.json()
+        response_data = set(response_data)
+        print(response.text)
+        tasks = []
+        async with aiohttp.ClientSession() as session:
+            for url in response_data:
+                tasks.append(fetch(session, "https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty".format(
+                    url)))
+            story_list = await asyncio.gather(*tasks)
+
         print(story_list)
         self.write(json.dumps(story_list, default=json_util.default))
         self.finish()
