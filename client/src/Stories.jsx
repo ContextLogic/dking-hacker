@@ -49,7 +49,6 @@ class Stories extends React.Component<StoryProps, StoryState> {
     };
   }
 
-  // Onclick change the data onscreen by setting the state of the search item
   async getStories() {
     const requestForStories = await fetch(
       `http://localhost:8888/stories/${this.props.searchItem}`
