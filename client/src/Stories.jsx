@@ -51,7 +51,7 @@ class Stories extends React.Component<StoryProps, StoryState> {
 
   async getStories() {
     const requestForStories = await fetch(
-      `http://localhost:8888/stories/${this.props.searchItem}`
+      `http://localhost:8888/stories/:${this.props.searchItem}`
     );
     const listOfStories = await requestForStories.json();
     this.setState({
